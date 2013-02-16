@@ -3,15 +3,11 @@ package se.sweddit.namnsdagar.contactspicker;
 import java.util.ArrayList;
 
 import se.sweddit.namnsdagar.DBHelper;
-import se.sweddit.namnsdagar.MainActivity;
 import se.sweddit.namnsdagar.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -146,9 +142,24 @@ public class ContactsPickerActivity extends Activity {
 			db.execSQL("DELETE FROM selectedcontacts;");
 			db.execSQL("BEGIN IMMEDIATE TRANSACTION");
 			for (Contact c : selectedContacts) {
-				db.execSQL("INSERT INTO selectedcontacts (id_contact,name) VALUES (" + c.getId() + ",'" + c.getName() + "');");
+				int month=1;
+				int day=1;
+	    		try {
+	    			String[] nameArr = c.getName().split(" ");
+	    			String selectQuery = "SELECT month,day FROM days WHERE name = '"+nameArr[0]+"';";
+	    			Cursor cursor = db.rawQuery(selectQuery, null);
+	    			cursor.moveToFirst();
+	    			if (!cursor.isAfterLast()) {
+	    				month = cursor.getInt(0);
+	    				day = cursor.getInt(1);
+	    			}
+	    		} catch (Exception e) {
+	    			Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
+	    		}
+				db.execSQL("INSERT INTO selectedcontacts (id_contact,month,day,name) VALUES (" + c.getId() + ",'" + c.getName() + "',"+month+","+day+");");
 			}
 			db.execSQL("COMMIT TRANSACTION");
+			db.close();
 		} catch (Exception e) {
 			Log.e("DB_INSERT","Failed to update selected contacts, "+e.toString());
 		}

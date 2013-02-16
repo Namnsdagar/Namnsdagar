@@ -21,6 +21,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class MainActivity extends Activity {
 	private static final String SETTINGS_NAME = "appSettings";
+	private static String todayNames = "";
 	
 	private ProgressDialog progress;
 
@@ -45,30 +46,6 @@ public class MainActivity extends Activity {
                 startActivityForResult(myIntent, 0);
             }
         });
-        
-        DBHelper dbh = new DBHelper(this);
-        SQLiteDatabase db = dbh.getReadableDatabase();
-        Calendar rightNow = Calendar.getInstance();
-        String namesToday = "";
-		try {
-			String selectQuery = "SELECT name FROM days WHERE month = " + (rightNow.get(Calendar.MONTH)+1) + " AND day = " + rightNow.get(Calendar.DAY_OF_MONTH) +";";
-			Cursor cursor = db.rawQuery(selectQuery, null);
-			cursor.moveToFirst();
-			if (!cursor.isAfterLast()) {
-				do {
-					if (namesToday.length()<2) {
-						namesToday = cursor.getString(0);
-					} else {
-						namesToday += ", " + cursor.getString(0);
-					}
-				} while (cursor.moveToNext());
-			}
-			db.close();
-		} catch (Exception e) {
-			Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
-		}
-		TextView nameText = (TextView)findViewById(R.id.textView3);
-		nameText.setText(namesToday);
         
     	// 1. Instantiate an AlertDialog.Builder with its constructor
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -97,7 +74,41 @@ public class MainActivity extends Activity {
     	
         if (isFirstLaunch()) {
         	dialog.show();
+        } else {
+        	getTodayNames(this);
         }
+    }
+    
+    private void getTodayNames(Context context) {
+        DBHelper dbh = new DBHelper(context);
+        SQLiteDatabase db = dbh.getReadableDatabase();
+        Calendar rightNow = Calendar.getInstance();
+        String namesToday = "";
+		try {
+			String selectQuery = "SELECT name FROM days WHERE month = " + (rightNow.get(Calendar.MONTH)+1) + " AND day = " + rightNow.get(Calendar.DAY_OF_MONTH) +";";
+			Cursor cursor = db.rawQuery(selectQuery, null);
+			cursor.moveToFirst();
+			if (!cursor.isAfterLast()) {
+				do {
+					if (namesToday.length()<2) {
+						namesToday = cursor.getString(0);
+					} else {
+						namesToday += ", " + cursor.getString(0);
+					}
+				} while (cursor.moveToNext());
+			}
+			db.close();
+		} catch (Exception e) {
+			Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
+		}
+		todayNames = namesToday;
+		MainActivity.this.runOnUiThread(new Runnable() {
+	        @Override
+	        public void run() {
+	    		TextView nameText = (TextView)findViewById(R.id.textView3);
+	    		nameText.setText(todayNames);
+	        }
+		});
     }
  
     private void loadData(boolean unofficial) {
@@ -116,6 +127,7 @@ public class MainActivity extends Activity {
     	}
     	return isFirst;
     }
+    
     public class dataThread implements Runnable {
     	private boolean unofficial;
     	private Context mContext;
@@ -129,6 +141,7 @@ public class MainActivity extends Activity {
 	   public void run() {
        	DBHelper dbh = new DBHelper(mContext);
        	dbh.insertData(mContext, unofficial);
+		getTodayNames(mContext);
    		progress.dismiss();
 	   }
 	}

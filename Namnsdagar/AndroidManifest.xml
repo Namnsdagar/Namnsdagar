@@ -26,6 +26,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name="se.sweddit.namnsdagar.contactspicker.ContactsPickerActivity"
+            android:label="@string/contacts_list" >
+        </activity>
     </application>
 
 </manifest>

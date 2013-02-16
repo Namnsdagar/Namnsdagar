@@ -6,5 +6,11 @@
     <string name="menu_settings">Inställningar</string>
     <string name="set_time">Välj tid då notifikationen skall visas</string>
     <string name="choose_mode">Visa notifikation dagen innan</string>
+    <string name="dialog_title">Välj lista</string>
+    <string name="dialog_message">Välj om du vill ha endast officiella namn eller även inkludera inofficiella</string>
+    <string name="dialog_official">Officiella</string>
+    <string name="dialog_unofficial">Inofficiella</string>
+    <string name="choose_contacts">Välj kontakter</string>
+    <string name="contacts_list">Kontaktlista</string>
 
 </resources>

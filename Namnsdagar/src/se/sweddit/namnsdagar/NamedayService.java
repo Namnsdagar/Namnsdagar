@@ -28,7 +28,7 @@ public class NamedayService extends IntentService {
 	protected void worker(Intent intent) {
 		// Check namedays here...
 		Log.d("NamedayService", "NamedayService worker method running...");
-		checkContactsNameday(0); // TODO: Dayoffset for notifications earlier. 
+		checkContactsNameday(); // TODO: Dayoffset for notifications earlier. 
 	}
 	
 	synchronized static PowerManager.WakeLock getWakeLock(Context context) {

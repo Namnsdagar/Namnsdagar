@@ -12,5 +12,8 @@
     <string name="dialog_unofficial">Inofficiella</string>
     <string name="choose_contacts">Välj kontakter</string>
     <string name="contacts_list">Kontaktlista</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="action_settings">Settings</string>
+    <string name="main_title">Namnsdag</string>
 
 </resources>

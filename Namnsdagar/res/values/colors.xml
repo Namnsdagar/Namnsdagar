@@ -5,4 +5,6 @@
     <color name="white">#e9e7e7</color>
     <color name="orange">#e9852b</color>
     <color name="gray">#4c5958</color>
+    <color name="main_date">#687a79</color>
+    <color name="main_name">#4c5958</color>
 </resources>

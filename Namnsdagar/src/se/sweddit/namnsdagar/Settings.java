@@ -29,8 +29,8 @@ public class Settings extends Activity {
 		setContentView(R.layout.activity_settings);
 
         
-        final Button button = (Button) findViewById(R.id.button1);
-        button.setOnClickListener(new View.OnClickListener() {
+        TextView contactText = (TextView) findViewById(R.id.textView3);
+        contactText.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
             	Intent myIntent = new Intent(v.getContext(), ContactsPickerActivity.class);
@@ -77,14 +77,14 @@ public class Settings extends Activity {
     	modeSelect.setChecked(mode);
 
     	int selCount = getSelectedCount(this);
-    	button.setText(getResources().getString(R.string.choose_contacts)+" ("+selCount+")");
+    	contactText.setText(getResources().getString(R.string.choose_contacts)+" ("+selCount+")");
 	}
     
     @Override
     public void onRestart() {
     	int selCount = getSelectedCount(this);
-        final Button button = (Button) findViewById(R.id.button1);
-    	button.setText(getResources().getString(R.string.choose_contacts)+" ("+selCount+")");
+        TextView contactText = (TextView) findViewById(R.id.textView3);
+        contactText.setText(getResources().getString(R.string.choose_contacts)+" ("+selCount+")");
     	super.onRestart();
     }
     

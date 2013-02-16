@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Namnsdagar</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Inställningar</string>
+    <string name="set_time">Välj tid då notifikationen skall visas</string>
+    <string name="choose_mode">Visa notifikation dagen innan</string>
+
+</resources>

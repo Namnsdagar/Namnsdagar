@@ -18,12 +18,18 @@ import android.widget.TextView;
 class ContactArrayAdapter extends ArrayAdapter<Contact> {
 	private LayoutInflater layoutInflater;
 	private Activity parentActivity;
+	private ArrayList<Contact> contactsInDB;
 
-	public ContactArrayAdapter(Activity context) {
+	public ContactArrayAdapter(Activity context, ArrayList<Contact> contactsInDB) {
 		super(context, R.layout.contactslistrow, R.id.rowTextView);
 		this.parentActivity = context;
+		
+		this.deselectAll();
 
+		this.contactsInDB = contactsInDB;
 		this.addAll(getContacts());
+		
+		
 		layoutInflater = LayoutInflater.from(context) ;
 	}
 
@@ -63,8 +69,10 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 				if(!deleted && 
 						contactNameSrc == ContactsContract.DisplayNameSources.STRUCTURED_NAME &&
 						!containsName(contactName,list) &&
+						!containsID(contactId, list) &&
 						Misc.isValidName(contactName)) {
-					list.add(new Contact(contactId,contactName, false));
+					
+					list.add(new Contact(contactId,contactName, containsID(contactId, contactsInDB)));
 				}
 				
 				rawContacts.moveToNext();
@@ -74,10 +82,25 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 		rawContacts.close();
 		return list;
 	}
+	
+	public void deselectAll() {
+		for (int i = 0; i < getCount(); i++) {
+			getItem(i).setChecked(false);
+		}
+	}
 
 	public boolean containsName(String name, ArrayList<Contact> list) {
 		for (Contact contact : list) {
 			if (contact.getName().equalsIgnoreCase(name))
+				return true;
+		}
+
+		return false;
+	}
+	
+	public boolean containsID(int id, ArrayList<Contact> list) {
+		for (Contact contact : list) {
+			if (contact.getId() == id)
 				return true;
 		}
 

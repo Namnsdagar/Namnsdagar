@@ -39,8 +39,9 @@ public class ContactsPickerActivity extends Activity {
 			}
 		});
 
+		ArrayList<Contact> contactsInDB = getSelected();
+		listAdapter = new ContactArrayAdapter(this,contactsInDB);
 		
-		listAdapter = new ContactArrayAdapter(this);
 		listView.setAdapter(listAdapter);      
 	}
 	
@@ -51,12 +52,11 @@ public class ContactsPickerActivity extends Activity {
 		DBHelper dbh = new DBHelper(this);
 		SQLiteDatabase db = dbh.getReadableDatabase();
 
-		String selectQuery = "SELECT * FROM days;";
+		String selectQuery = "SELECT * FROM selectedcontacts;";
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		cursor.moveToFirst();
 		if (!cursor.isAfterLast()) {
 			do {
-				Log.d("DB_DUMP",cursor.getInt(0)+", "+cursor.getInt(1)+", "+cursor.getString(2));
 				contactItem = new Contact();
 				contactItem.setId(cursor.getInt(0));
 				contactItem.setName(cursor.getString(1));
@@ -91,6 +91,7 @@ public class ContactsPickerActivity extends Activity {
 		Toast toast = Toast.makeText(getApplicationContext(), "Selected " + selectedContacts.size() + " contacts!", Toast.LENGTH_LONG);
 		toast.show();
 		
+		listAdapter.deselectAll();
 		super.onBackPressed();
 	}
 }

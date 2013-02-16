@@ -82,7 +82,12 @@ public class ContactsPickerActivity extends Activity {
 				String value = input.getEditableText().toString();
 
 				//vet inte om detta funkar som det skall
-				c.setName(value);
+				//c.setName(value);
+				
+				//gör något med det nya namnet
+				//släng in i DB kanske?
+				
+				c.setChecked(true);
 			}
 		});
 

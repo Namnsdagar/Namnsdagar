@@ -73,7 +73,6 @@ public class ContactsPickerActivity extends Activity {
 	public void onBackPressed() {
 		//selection complete
 		ArrayList<Contact> selectedContacts = listAdapter.getSelectedContacts();
-		
 		try {
 			DBHelper dbh = new DBHelper(this);
 			SQLiteDatabase db = dbh.getWritableDatabase();

@@ -108,7 +108,40 @@ public class MainActivity extends Activity {
     	
         if (isFirstLaunch()) {
         	dialog.show();
+        } else {
+        	int selCount = getSelectedCount(this);
+        	
+        	button.setText(getResources().getString(R.string.choose_contacts)+" ("+selCount+")");
         }
+    }
+    
+    @Override
+    public void onRestart() {
+    	int selCount = getSelectedCount(this);
+        final Button button = (Button) findViewById(R.id.button1);
+    	button.setText(getResources().getString(R.string.choose_contacts)+" ("+selCount+")");
+    	super.onRestart();
+    }
+    
+    private int getSelectedCount(Context context) {
+    	int count = 0;
+    	
+    	DBHelper dbh = new DBHelper(context);
+    	SQLiteDatabase db = dbh.getReadableDatabase();
+    	
+		try {
+			String selectQuery = "SELECT COUNT(id_contact) AS count FROM selectedcontacts;";
+			Cursor cursor = db.rawQuery(selectQuery, null);
+			cursor.moveToFirst();
+			if (!cursor.isAfterLast()) {
+				count = cursor.getInt(0);
+			}
+			db.close();
+		} catch (Exception e) {
+			Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
+		}
+    	
+    	return count;
     }
  
     private void loadData(boolean unofficial) {

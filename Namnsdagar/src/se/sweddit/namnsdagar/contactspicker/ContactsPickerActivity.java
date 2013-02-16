@@ -6,6 +6,7 @@ import se.sweddit.namnsdagar.DBHelper;
 import se.sweddit.namnsdagar.R;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,7 +44,30 @@ public class ContactsPickerActivity extends Activity {
 		listView.setAdapter(listAdapter);      
 	}
 	
-	
+	private ArrayList<Contact> getSelected() {
+		ArrayList<Contact> contactList = new ArrayList<Contact>();
+		
+		Contact contactItem;
+		DBHelper dbh = new DBHelper(this);
+		SQLiteDatabase db = dbh.getReadableDatabase();
+
+		String selectQuery = "SELECT * FROM days;";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		cursor.moveToFirst();
+		if (!cursor.isAfterLast()) {
+			do {
+				Log.d("DB_DUMP",cursor.getInt(0)+", "+cursor.getInt(1)+", "+cursor.getString(2));
+				contactItem = new Contact();
+				contactItem.setId(cursor.getInt(0));
+				contactItem.setName(cursor.getString(1));
+				contactItem.setChecked(true);
+				contactList.add(contactItem);
+			} while (cursor.moveToNext());
+		}
+		db.close();
+		
+		return contactList;
+	}
 	
 	@Override
 	public void onBackPressed() {

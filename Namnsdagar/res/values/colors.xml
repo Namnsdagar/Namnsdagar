@@ -2,5 +2,7 @@
 <resources>
     <color name="bg_title">#3B3B3B</color>
     <color name="bg_item">#9C9C9C</color>
-    <color name="white">#FFFFFF</color>
+    <color name="white">#e9e7e7</color>
+    <color name="orange">#e9852b</color>
+    <color name="gray">#4c5958</color>
 </resources>

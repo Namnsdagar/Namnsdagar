@@ -20,7 +20,8 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-		<receiver  android:process=":remote" android:name="Alarm"></receiver>
+		<receiver  android:process=":remote" android:name=".Alarm"></receiver>
+		<service android:enabled="true" android:name=".NamedayService" />
         <activity
             android:name="se.sweddit.namnsdagar.MainActivity"
             android:label="@string/app_name" >

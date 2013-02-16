@@ -1,7 +1,10 @@
 package se.sweddit.namnsdagar;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.List;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -13,6 +16,7 @@ import android.util.Log;
 
 public class NamedayService extends IntentService {
 
+	private SQLiteDatabase db;
 	private static PowerManager.WakeLock wakeLock = null;
 	public static final String LOCK = "se.sweddit.namnsdagar.NamedayService";
 
@@ -38,12 +42,18 @@ public class NamedayService extends IntentService {
 	@Override
 	final protected void onHandleIntent(Intent intent) {
 		try {
+			Log.d("NamedayService", "Recieved intent");
 			worker(intent);
 		}
 		finally {
-			// Release wake lock when we're done.
-			getWakeLock(this).release();
+			if (db.isOpen())
+				db.close();
 		}
+		
+		// Release wake lock when we're done.
+		try {
+			getWakeLock(this).release();
+		} catch (Exception e) {}
 	}
 	
 	
@@ -54,38 +64,43 @@ public class NamedayService extends IntentService {
 		calNow.setTimeInMillis(System.currentTimeMillis());
 		
 		Calendar cal = new GregorianCalendar();
-		cal.setFirstDayOfWeek(Calendar.MONDAY);
-		cal.add(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR) + dayOffset); // Vad händer om det blir mer än antal dagar på ett år?
-		int month = cal.get(Calendar.MONTH);
-		int day = cal.get(Calendar.DAY_OF_WEEK);
+		cal.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR) + dayOffset); // Vad händer om det blir mer än antal dagar på ett år?
+		int month = cal.get(Calendar.MONTH) + 1;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
 				
 		DBHelper dbh = new DBHelper(this);
-    	SQLiteDatabase db = dbh.getReadableDatabase();
+    	db = dbh.getReadableDatabase();
 
     	// Hämta namnsdagar för den valda dagen
-		String query = "SELECT * FROM days WHERE month='" + month + "' AND day='" + day + "'";
+		String query = "SELECT name FROM days WHERE month='" + month + "' AND day='" + day + "'";
 		Cursor cursor = db.rawQuery(query, null);
 		cursor.moveToFirst();
-		String names = "";
-		while (!cursor.isLast()) {
-			names += "name='" + cursor.getString(1) + "' OR";
-			cursor.moveToNext();
+		List<String> namedayNames = new ArrayList<String>();
+		if (cursor.getCount() > 0) {
+			do {
+				namedayNames.add(cursor.getString(0));
+			} while (cursor.moveToNext());
 		}
-		names += "name='" + cursor.getString(1) + "'";
 		
 		// Välj de kontakter som matchar namnen för dagens namnsdag
-		query = "SELECT * FROM selectedcontacts WHERE "+ names +" COLLATE Latin1_General_bin";
+		query = "SELECT * FROM selectedcontacts"; //WHERE "+ names;
 		cursor = db.rawQuery(query, null);
-
+		HashSet<String> names = new HashSet<String>();
 		if (cursor.getCount() > 0) {
-			// Some contact have their nameday for the selected day.
-			// Send notification
+			// Get first name
+			names.add(((String[])cursor.getString(1).split(" ", 1))[0]);
+			
+			for (String s : names) {
+				Log.d("NAME", s);
+			}
 		}
 		
-		cursor.moveToFirst();
-		do {
-			Log.d("NamedayForContact: ", cursor.getString(1));
-		} while (cursor.moveToNext());
+		for (String s : namedayNames) {
+			if (names.contains(s))
+				; // Send notification intent for this contact
+		}
+				
+		
 		db.close();
 	}
 }

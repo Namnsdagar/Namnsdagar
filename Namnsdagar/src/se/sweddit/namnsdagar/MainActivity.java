@@ -34,6 +34,10 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        // Start Alarm for nameday checks
+        Alarm alarm = new Alarm();
+        alarm.SetAlarm(this);
+        
         final Button button = (Button) findViewById(R.id.button1);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -145,7 +149,7 @@ public class MainActivity extends Activity {
     }
  
     private void loadData(boolean unofficial) {
-    	progress = ProgressDialog.show(MainActivity.this,"","Förbereder...");
+    	progress = ProgressDialog.show(MainActivity.this,"","Fï¿½rbereder...");
     	Runnable r = new dataThread(unofficial,MainActivity.this);
     	new Thread(r).start();
     }

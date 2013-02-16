@@ -22,7 +22,7 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 	public ContactArrayAdapter(Activity context) {
 		super(context, R.layout.contactslistrow, R.id.rowTextView);
 		this.parentActivity = context;
-		
+
 		this.addAll(getContacts());
 		layoutInflater = LayoutInflater.from(context) ;
 	}
@@ -40,9 +40,12 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 				RawContacts.DISPLAY_NAME_SOURCE
 		};
 
+		
+		String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
+		
 		final Cursor rawContacts = parentActivity.managedQuery(
 				RawContacts.CONTENT_URI,
-				projection,null,null,null);
+				projection,null,null,sortOrder);
 
 
 		final int contactIdColumnIndex = rawContacts.getColumnIndex(RawContacts.CONTACT_ID);
@@ -51,36 +54,44 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 		final int nameSrcColumnIndex = rawContacts.getColumnIndex(RawContacts.DISPLAY_NAME_SOURCE);
 
 		if(rawContacts.moveToFirst()) {
-			while(!rawContacts.isAfterLast()) {		// still a valid entry left?
-				
+			while(!rawContacts.isAfterLast()) {
 				final int contactId = rawContacts.getInt(contactIdColumnIndex);
 				final String contactName = rawContacts.getString(nameColumnIndex);
 				final int contactNameSrc = rawContacts.getInt(nameSrcColumnIndex);
-
 				final boolean deleted = (rawContacts.getInt(deletedColumnIndex) == 1);
 
 				if(!deleted && 
 						contactNameSrc == ContactsContract.DisplayNameSources.STRUCTURED_NAME &&
+						!containsName(contactName,list) &&
 						Misc.isValidName(contactName)) {
 					list.add(new Contact(contactId,contactName, false));
 				}
-				rawContacts.moveToNext();			// move to the next entry
+				
+				rawContacts.moveToNext();
 			}
 		}
 
 		rawContacts.close();
-
 		return list;
 	}
-	
+
+	public boolean containsName(String name, ArrayList<Contact> list) {
+		for (Contact contact : list) {
+			if (contact.getName().equalsIgnoreCase(name))
+				return true;
+		}
+
+		return false;
+	}
+
 	public ArrayList<Contact> getSelectedContacts() {
 		ArrayList<Contact> selected = new ArrayList<Contact>();
-		
+
 		for (int i = 0; i < getCount(); i++) {
-			if (getItem(i).isChecked())
+			if (getItem(i).getChecked())
 				selected.add(this.getItem(i));
 		}
-		
+
 		return selected;
 	}
 
@@ -101,7 +112,7 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 			checkBox.setOnClickListener( new View.OnClickListener() {
 				public void onClick(View v) {
 					CheckBox cb = (CheckBox) v;
-					
+
 					Contact c = (Contact) cb.getTag();
 					c.setChecked(cb.isChecked());
 				}
@@ -113,7 +124,7 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 		}
 
 		checkBox.setTag(contact); 
-		checkBox.setChecked(contact.isChecked());
+		checkBox.setChecked(contact.getChecked());
 		textView.setText(contact.getName());      
 
 		return convertView;

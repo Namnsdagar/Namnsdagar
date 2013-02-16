@@ -34,7 +34,7 @@ public class ContactsPickerActivity extends Activity {
 				contact.toggle();
 				
 				ContactViewHolder viewHolder = (ContactViewHolder) item.getTag();
-				viewHolder.getCheckBox().setChecked(contact.isChecked());
+				viewHolder.getCheckBox().setChecked(contact.getChecked());
 			}
 		});
 

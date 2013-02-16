@@ -16,6 +16,14 @@ class Contact {
 		this.name = name ;
 		this.checked = checked ;
 	}
+	
+	public String toString() {
+		return name ; 
+	}
+	
+	public void toggle() {
+		checked = !checked ;
+	}
 
 	public String getName() {
 		return name;
@@ -25,20 +33,12 @@ class Contact {
 		this.name = name;
 	}
 	
-	public boolean isChecked() {
+	public boolean getChecked() {
 		return checked;
 	}
 	
 	public void setChecked(boolean checked) {
 		this.checked = checked;
-	}
-	
-	public String toString() {
-		return name ; 
-	}
-	
-	public void toggle() {
-		checked = !checked ;
 	}
 	
 	public int getId() {

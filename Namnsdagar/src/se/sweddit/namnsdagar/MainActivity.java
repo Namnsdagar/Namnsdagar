@@ -112,7 +112,7 @@ public class MainActivity extends Activity {
     }
  
     private void loadData(boolean unofficial) {
-    	progress = ProgressDialog.show(MainActivity.this,"","F�rbereder...");
+    	progress = ProgressDialog.show(MainActivity.this,"","Förbereder...");
     	Runnable r = new dataThread(unofficial,MainActivity.this);
     	new Thread(r).start();
     }

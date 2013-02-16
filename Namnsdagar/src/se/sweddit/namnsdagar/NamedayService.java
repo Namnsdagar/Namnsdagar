@@ -3,12 +3,12 @@ package se.sweddit.namnsdagar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.List;
 
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.PowerManager;
@@ -19,6 +19,7 @@ public class NamedayService extends IntentService {
 	private SQLiteDatabase db;
 	private static PowerManager.WakeLock wakeLock = null;
 	public static final String LOCK = "se.sweddit.namnsdagar.NamedayService";
+	private static final String SETTINGS_NAME = "appSettings";
 
 	public NamedayService() {
 		super("NamedayService");
@@ -57,7 +58,15 @@ public class NamedayService extends IntentService {
 	}
 	
 	
-	public void checkContactsNameday(int dayOffset) {
+	public void checkContactsNameday() {
+		
+		// Notify day before actual name day?
+		int dayOffset = 0;
+		boolean remind_mode = false;
+		SharedPreferences settings = this.getSharedPreferences(SETTINGS_NAME, 0);
+		settings.getBoolean("remind_mode", remind_mode);
+		if (remind_mode)
+			dayOffset = 1;
 		
 		// Today it is...
 		Calendar calNow = new GregorianCalendar();
@@ -69,37 +78,26 @@ public class NamedayService extends IntentService {
 		int day = cal.get(Calendar.DAY_OF_MONTH);
 				
 		DBHelper dbh = new DBHelper(this);
-    	db = dbh.getReadableDatabase();
-
-    	// Hämta namnsdagar för den valda dagen
-		String query = "SELECT name FROM days WHERE month='" + month + "' AND day='" + day + "'";
-		Cursor cursor = db.rawQuery(query, null);
-		cursor.moveToFirst();
-		List<String> namedayNames = new ArrayList<String>();
-		if (cursor.getCount() > 0) {
-			do {
-				namedayNames.add(cursor.getString(0));
-			} while (cursor.moveToNext());
-		}
+    	db = dbh.getReadableDatabase();		
 		
 		// Välj de kontakter som matchar namnen för dagens namnsdag
-		query = "SELECT * FROM selectedcontacts"; //WHERE "+ names;
+		String query = "SELECT * FROM selectedcontacts WHERE month='" + month + "' AND day='" + day + "'";
+		Cursor cursor = db.rawQuery(query, null);
 		cursor = db.rawQuery(query, null);
-		HashSet<String> names = new HashSet<String>();
+		List<String> names = new ArrayList<String>();
 		if (cursor.getCount() > 0) {
 			// Get first name
-			names.add(((String[])cursor.getString(1).split(" ", 1))[0]);
+			cursor.moveToFirst();
+			do {
+				names.add(cursor.getString(1));
+			} while (cursor.moveToNext());
 			
 			for (String s : names) {
-				Log.d("NAME", s);
-			}
-		}
-		
-		for (String s : namedayNames) {
-			if (names.contains(s))
-				; // Send notification intent for this contact
-		}
+				Log.d("NAMEDAY_FOUND", s);
 				
+				// TODO: Send notification
+			}
+		}				
 		
 		db.close();
 	}

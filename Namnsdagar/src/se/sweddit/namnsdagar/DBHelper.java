@@ -24,9 +24,9 @@ public class DBHelper extends SQLiteOpenHelper {
 	private static final String CREATE_CONTACTS = "CREATE TABLE" +
 			" selectedcontacts (" +
 			" id_contact INT," +
+			" name INT," +
 			" month INT," +
-			" day INT," +
-			" name TEXT);";
+			" day TEXT);";
 	//private static final String CLEAR_TABLE = "DELETE FROM days;";
 
 	public DBHelper (Context context) {

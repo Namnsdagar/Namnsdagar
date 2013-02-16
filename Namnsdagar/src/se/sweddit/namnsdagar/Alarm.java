@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.util.Log;
 
@@ -23,7 +24,13 @@ public class Alarm extends BroadcastReceiver {
 	}
 	
 	public void SetAlarm(Context context) {
-				
+		int hour = 8;
+		int minute = 0;
+		SharedPreferences settings = context.getSharedPreferences(SETTINGS_NAME, 0);
+		settings.getInt("remind_hour", hour);
+		settings.getInt("remind_minute", minute);
+		
+		
 		// Time now for settings event time
 		Calendar calNow = new GregorianCalendar();
 		calNow.setTimeInMillis(System.currentTimeMillis());
@@ -31,14 +38,14 @@ public class Alarm extends BroadcastReceiver {
 		// We want the event 08:00 every day
 		Calendar cal = new GregorianCalendar();
 		cal.add(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR) + 1);
-		cal.set(Calendar.HOUR_OF_DAY, 8);
-		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.HOUR_OF_DAY, hour);
+		cal.set(Calendar.MINUTE, minute);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 
 		AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 		Intent i = new Intent(context, Alarm.class);
-		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+		PendingIntent pi = PendingIntent.getBroadcast(context, 101, i, 0);
 		am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
 		Log.d("ALARM_SET", "Alarm is now set");
 	}

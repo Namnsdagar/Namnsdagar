@@ -156,7 +156,7 @@ public class ContactsPickerActivity extends Activity {
 	    		} catch (Exception e) {
 	    			Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
 	    		}
-				db.execSQL("INSERT INTO selectedcontacts (id_contact,month,day,name) VALUES (" + c.getId() + ",'" + c.getName() + "',"+month+","+day+");");
+				db.execSQL("INSERT INTO selectedcontacts (id_contact,name,month,day) VALUES (" + c.getId() + ",'" + c.getName() + "',"+month+","+day+");");
 			}
 			db.execSQL("COMMIT TRANSACTION");
 			db.close();

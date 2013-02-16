@@ -9,11 +9,19 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -44,9 +52,7 @@ public class ContactsPickerActivity extends Activity {
 
 
 				if (!acceptableNames.contains(Misc.getFirstName(contact.getName()))) {
-					String[] suggestions = Misc.getSimilarNames(contact.getName(), acceptableNames,5);
-
-					showSuggestionDialog(contact,suggestions);
+					showSuggestionDialog(contact);
 				} else {
 					contact.toggle();
 
@@ -63,27 +69,30 @@ public class ContactsPickerActivity extends Activity {
 		listView.setAdapter(listAdapter);      
 	}
 
-	public void showSuggestionDialog(final Contact c, final String[] suggestions) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	public void showSuggestionDialog(final Contact c) {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-		builder.setItems(suggestions, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
+		final AutoCompleteTextView input = new AutoCompleteTextView(this);
 
-				Toast toast = Toast.makeText(getApplicationContext(), "Selected " + suggestions[which], Toast.LENGTH_SHORT);
-				toast.show();
+		ArrayAdapter<String> suggestionAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,acceptableNames);
+		input.setAdapter(suggestionAdapter);
 
+		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String value = input.getEditableText().toString();
 
-				//ingen aning om det här funkar som det skall...
-				c.setName(suggestions[which]);
+				//vet inte om detta funkar som det skall
+				c.setName(value);
 			}
 		});
 
 
-		AlertDialog alertDialog = builder.create();
+
+		final AlertDialog alertDialog = builder.create();
 		alertDialog.setTitle("Kunde inte hitta " + Misc.getFirstName(c.getName()));
 
 		alertDialog.setIcon(R.drawable.icon);
+		alertDialog.setView(input);
 		alertDialog.show();
 	}
 

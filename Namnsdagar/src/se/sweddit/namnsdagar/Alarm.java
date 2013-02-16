@@ -3,13 +3,11 @@ package se.sweddit.namnsdagar;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import android.R.bool;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.util.Log;
 
@@ -32,7 +30,7 @@ public class Alarm extends BroadcastReceiver {
 
 		// We want the event 08:00 every day
 		Calendar cal = new GregorianCalendar();
-		cal.add(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
+		cal.add(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR) + 1);
 		cal.set(Calendar.HOUR_OF_DAY, 8);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);

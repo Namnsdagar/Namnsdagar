@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -106,6 +108,8 @@ public class MainActivity extends Activity {
     	
         if (isFirstLaunch()) {
         	dialog.show();
+        } else {
+        	dumpActive(this);
         }
     }
  
@@ -124,6 +128,19 @@ public class MainActivity extends Activity {
 	    	editor.commit();
     	}
     	return isFirst;
+    }
+    
+    private void dumpActive(Context context) {
+    	DBHelper dbh = new DBHelper(context);
+    	SQLiteDatabase db = dbh.getReadableDatabase();
+
+		String selectQuery = "SELECT * FROM selectedcontacts;";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		cursor.moveToFirst();
+		do {
+			Log.d("DB_DUMP",cursor.getInt(0)+", "+cursor.getString(1));
+		} while (cursor.moveToNext());
+		db.close();
     }
 
     @Override

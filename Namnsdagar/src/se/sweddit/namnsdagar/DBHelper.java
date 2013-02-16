@@ -21,6 +21,10 @@ public class DBHelper extends SQLiteOpenHelper {
 			" month INT," +
 			" day INT," +
 			" name TEXT);";
+	private static final String CREATE_CONTACTS = "CREATE TABLE" +
+			" selectedcontacts (" +
+			" id_contact INT," +
+			" name TEXT);";
 	//private static final String CLEAR_TABLE = "DELETE FROM days;";
 
 	public DBHelper (Context context) {
@@ -58,6 +62,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CREATE_STRING);
+		db.execSQL(CREATE_CONTACTS);
 	}
 	
 	@Override

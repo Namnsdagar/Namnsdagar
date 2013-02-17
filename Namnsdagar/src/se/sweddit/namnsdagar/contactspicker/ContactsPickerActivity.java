@@ -35,8 +35,6 @@ public class ContactsPickerActivity extends Activity {
 		//TODO detta bör givetvis inte göras varje gång 
 		acceptableNames = getAllNames();
 
-
-
 		listView = (ListView) findViewById( R.id.contactsListView);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -126,7 +124,7 @@ public class ContactsPickerActivity extends Activity {
 			do {
 				contactItem = new Contact();
 				contactItem.setId(cursor.getInt(0));
-				contactItem.setName(cursor.getString(1));
+				contactItem.setName(cursor.getString(3));
 				contactItem.setChecked(true);
 				contactList.add(contactItem);
 			} while (cursor.moveToNext());
@@ -168,10 +166,6 @@ public class ContactsPickerActivity extends Activity {
 		} catch (Exception e) {
 			Log.e("DB_INSERT","Failed to update selected contacts, "+e.toString());
 		}
-
-		//do something with selected contacts...
-		Toast toast = Toast.makeText(getApplicationContext(), "Selected " + selectedContacts.size() + " contacts!", Toast.LENGTH_SHORT);
-		toast.show();
 
 		listAdapter.deselectAll();
 		super.onBackPressed();

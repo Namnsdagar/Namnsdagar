@@ -51,7 +51,7 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 				String contactName = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
 
-				if (!containsName(contactName,list) &&
+				if (contactName != null && !containsName(contactName,list) &&
 						!containsID(contactId, list) &&
 						Misc.isValidName(contactName)) {
 

@@ -6,7 +6,6 @@ import se.sweddit.namnsdagar.R;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.RawContacts;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

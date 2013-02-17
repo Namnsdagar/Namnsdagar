@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
@@ -18,9 +19,11 @@ public class NamedayNotification
 			text = "har namnsdag imorgon!";
 		
 		NotificationCompat.Builder ncB = new NotificationCompat.Builder(context)
+												.setAutoCancel(true)
 		        								.setSmallIcon(R.drawable.notification)
 		        								.setContentTitle(names)
-		        								.setContentText(text);
+		        								.setContentText(text)
+		        								.setLights(Color.rgb(255,192,203), 1000, 500);
 		
 		// Activity to start when notification is clicked...
 		Intent i = new Intent(context, MainActivity.class); // Create result page for notification?

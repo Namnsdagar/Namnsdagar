@@ -124,6 +124,9 @@ public class Settings extends Activity {
         	timeText.setText(getResources().getString(R.string.set_time)+" ("+hourOfDay+":"+displayMinute+")");
             tDialog.hide();
             Log.i("SET_TIME","Hour: "+hourOfDay+", Minute: "+minute);
+            
+            Alarm alarm = new Alarm();
+            alarm.SetAlarm(view.getContext());
         }
     }
 

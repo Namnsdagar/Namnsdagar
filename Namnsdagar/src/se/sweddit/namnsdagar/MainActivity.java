@@ -29,10 +29,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-       
-        // Start Alarm for nameday checks
-        Alarm alarm = new Alarm();
-        alarm.SetAlarm(this);
         
         Date todayDate = new Date();
         TextView dateView = (TextView)findViewById(R.id.textView2);
@@ -74,6 +70,10 @@ public class MainActivity extends Activity {
     	
         if (isFirstLaunch()) {
         	dialog.show();
+        	
+        	// Start Alarm for name day checks
+            Alarm alarm = new Alarm();
+            alarm.SetAlarm(this);
         } else {
         	getTodayNames(this);
         }
@@ -142,6 +142,7 @@ public class MainActivity extends Activity {
        	DBHelper dbh = new DBHelper(mContext);
        	dbh.insertData(mContext, unofficial);
 		getTodayNames(mContext);
+		
    		progress.dismiss();
 	   }
 	}

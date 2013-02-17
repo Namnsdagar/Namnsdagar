@@ -72,8 +72,8 @@ public class NamedayService extends IntentService {
 		calNow.setTimeInMillis(System.currentTimeMillis());
 		
 		Calendar cal = new GregorianCalendar();
-		cal.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR) + dayOffset);
-		cal.roll(Calendar.DAY_OF_YEAR, 1);
+		cal.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
+		cal.roll(Calendar.DAY_OF_YEAR, dayOffset);
 		int month = cal.get(Calendar.MONTH) + 1;
 		int day = cal.get(Calendar.DAY_OF_MONTH);
 				

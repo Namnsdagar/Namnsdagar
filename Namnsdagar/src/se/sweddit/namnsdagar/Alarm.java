@@ -35,7 +35,8 @@ public class Alarm extends BroadcastReceiver {
 
 		// We want the event 08:00 every day
 		Calendar cal = new GregorianCalendar();
-		cal.add(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR) + 1);
+		cal.add(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
+		cal.roll(Calendar.DAY_OF_YEAR, 1);
 		cal.set(Calendar.HOUR_OF_DAY, hour);
 		cal.set(Calendar.MINUTE, minute);
 		cal.set(Calendar.SECOND, 0);

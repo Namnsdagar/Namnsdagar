@@ -3,6 +3,7 @@ package se.sweddit.namnsdagar.contactspicker;
 import java.util.ArrayList;
 
 import se.sweddit.namnsdagar.R;
+import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
@@ -31,49 +32,30 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 		layoutInflater = LayoutInflater.from(context) ;
 	}
 
-	@SuppressWarnings("deprecation")
 	public ArrayList<Contact> getContacts() {
-		// http://app-solut.com/blog/2011/03/working-with-the-contactscontract-to-query-contacts-in-android/
+		// http://www.higherpass.com/Android/Tutorials/Working-With-Android-Contacts/
 
 		ArrayList<Contact> list = new ArrayList<Contact>();
-
-		final String[] projection = new String[] {
-				RawContacts.CONTACT_ID,
-				RawContacts.DELETED,
-				RawContacts.DISPLAY_NAME_PRIMARY,
-				RawContacts.DISPLAY_NAME_SOURCE
-		};
-
-
+		
 		String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
 
-		final Cursor rawContacts = parentActivity.managedQuery(
-				RawContacts.CONTENT_URI,
-				projection,null,null,sortOrder);
+		ContentResolver cr = parentActivity.getContentResolver();
+		Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,null, null, null, sortOrder);
+
+		if (cur.getCount() > 0) {
+			while (cur.moveToNext()) {
+				int contactId = cur.getInt(cur.getColumnIndex(ContactsContract.Contacts._ID));
+				String contactName = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
 
-		final int contactIdColumnIndex = rawContacts.getColumnIndex(RawContacts.CONTACT_ID);
-		final int deletedColumnIndex = rawContacts.getColumnIndex(RawContacts.DELETED);
-		final int nameColumnIndex = rawContacts.getColumnIndex(RawContacts.DISPLAY_NAME_PRIMARY);
-		final int nameSrcColumnIndex = rawContacts.getColumnIndex(RawContacts.DISPLAY_NAME_SOURCE);
-
-		if(rawContacts.moveToFirst()) {
-			while(!rawContacts.isAfterLast()) {
-				final int contactId = rawContacts.getInt(contactIdColumnIndex);
-				String contactName = rawContacts.getString(nameColumnIndex);
-				final int contactNameSrc = rawContacts.getInt(nameSrcColumnIndex);
-				final boolean deleted = (rawContacts.getInt(deletedColumnIndex) == 1);
-
-				if(!deleted && 
-						contactNameSrc == ContactsContract.DisplayNameSources.STRUCTURED_NAME &&
-						!containsName(contactName,list) &&
+				if (!containsName(contactName,list) &&
 						!containsID(contactId, list) &&
 						Misc.isValidName(contactName)) {
 
 					//renames contact if contactName and DBname are different
 					if (containsID(contactId,contactsInDB) ){
 						Contact dbContact = contactsInDB.get(indexOfID(contactId, contactsInDB));
-	
+
 						String dbName = dbContact.getName();
 						if (!dbName.equals(contactName)) {
 							contactName = dbName;
@@ -81,12 +63,11 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 					}
 
 					list.add(new Contact(contactId,contactName, containsID(contactId, contactsInDB)));
-				}
 
-				rawContacts.moveToNext();
+				}
 			}
 		}
-
+		
 		return list;
 	}
 

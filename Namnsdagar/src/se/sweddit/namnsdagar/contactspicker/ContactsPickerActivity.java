@@ -119,10 +119,7 @@ public class ContactsPickerActivity extends Activity {
 			} while (cursor.moveToNext());
 		}
 		
-
-	//	cursor.close();
 		db.close();
-
 		return namelist;
 	}
 
@@ -146,9 +143,7 @@ public class ContactsPickerActivity extends Activity {
 			} while (cursor.moveToNext());
 		}
 
-	//	cursor.close();
 		db.close();
-		
 		return contactList;
 	}
 	
@@ -173,7 +168,6 @@ public class ContactsPickerActivity extends Activity {
 						month = cursor.getInt(0);
 						day = cursor.getInt(1);
 					}
-				//	cursor.close();
 				} catch (Exception e) {
 					Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
 				}
@@ -185,45 +179,7 @@ public class ContactsPickerActivity extends Activity {
 			Log.e("DB_INSERT","Failed to update selected contacts, "+e.toString());
 		}
 	}
-	
-	
-	
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if (keyCode == KeyEvent.KEYCODE_HOME) {
-	    	Log.i("DEBUG", "Pressed HOME");
 
-	        return true;
-	    }
-	    return super.onKeyDown(keyCode, event);
-	}
-	
-	@Override
-	protected void onResume() {
-		if (cursor.isClosed()) {
-			Log.i("DEBUG", "Cursor is closed!");
-			
-			//cursor = new CursorLoader(this).loadInBackground();
-		}
-		
-		
-		Log.i("DEBUG", "Resume");
-		super.onResume();
-	}
-	
-	@Override
-	protected void onDestroy() {
-		Log.i("DEBUG", "Destroy");
-		super.onDestroy();
-	}
-	
-	@Override
-	protected void onStop() {
-		Log.i("DEBUG", "Stop");
-		
-		cursor.close();				
-		super.onStop();
-	}
 
 	@Override
 	public void onBackPressed() {

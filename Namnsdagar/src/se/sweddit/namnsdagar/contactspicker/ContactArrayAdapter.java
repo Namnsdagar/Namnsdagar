@@ -87,7 +87,6 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 			}
 		}
 
-		rawContacts.close();
 		return list;
 	}
 

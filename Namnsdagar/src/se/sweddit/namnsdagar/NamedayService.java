@@ -62,9 +62,8 @@ public class NamedayService extends IntentService {
 		
 		// Notify day before actual name day?
 		int dayOffset = 0;
-		boolean remind_mode = false;
 		SharedPreferences settings = this.getSharedPreferences(SETTINGS_NAME, 0);
-		settings.getBoolean("remind_mode", remind_mode);
+		boolean remind_mode = settings.getBoolean("remind_mode", false);
 		if (remind_mode)
 			dayOffset = 1;
 		

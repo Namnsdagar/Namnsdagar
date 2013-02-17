@@ -24,11 +24,9 @@ public class Alarm extends BroadcastReceiver {
 	}
 	
 	public void SetAlarm(Context context) {
-		int hour = 8;
-		int minute = 0;
 		SharedPreferences settings = context.getSharedPreferences(SETTINGS_NAME, 0);
-		settings.getInt("remind_hour", hour);
-		settings.getInt("remind_minute", minute);
+		int hour = settings.getInt("remind_hour", 8);
+		int minute = settings.getInt("remind_minute", 0);
 		
 		
 		// Time now for settings event time

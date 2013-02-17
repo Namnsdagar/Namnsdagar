@@ -16,5 +16,6 @@
     <string name="title_activity_settings">Settings</string>
     <string name="action_settings">Settings</string>
     <string name="main_title">Namnsdag</string>
+    <string name="main_footer">Ett gemensamt arbete med deltagare från Sweddit</string>
 
 </resources>

@@ -2,6 +2,8 @@ package se.sweddit.namnsdagar;
 
 import se.sweddit.namnsdagar.contactspicker.ContactsPickerActivity;
 import android.os.Bundle;
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
@@ -23,11 +25,16 @@ public class Settings extends Activity {
 	private static final String SETTINGS_NAME = "appSettings";
 	private TimePickerDialog tDialog;
 
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_settings);
-
+		
+        if (android.os.Build.VERSION.SDK_INT>10) {
+        	ActionBar actionBar = getActionBar();
+        	actionBar.hide();
+        }
         
         TextView contactText = (TextView) findViewById(R.id.textView3);
         contactText.setOnClickListener(new View.OnClickListener() {

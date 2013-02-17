@@ -71,7 +71,19 @@
                 android:layout_height="40dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/btnpress" />
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:layout_weight="0"
+            android:text="@string/main_footer"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:typeface="sans" />
 
     </LinearLayout>
 

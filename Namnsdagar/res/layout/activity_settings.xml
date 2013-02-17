@@ -20,36 +20,42 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:background="@color/gray"
-            android:gravity="center"
+            android:gravity="left|center"
+            android:paddingLeft="10dp"
             android:text="@string/set_time"
             android:textColor="@color/white"
             android:textSize="14sp"
-            android:textStyle="bold" />
+            android:typeface="sans" />
 
         <TextView
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:background="@color/white"
-            android:gravity="center"
+            android:gravity="left|center"
+            android:paddingLeft="10dp"
+            android:text="@string/choose_contacts"
             android:textColor="@color/gray"
             android:textSize="14sp"
-            android:textStyle="bold"
-            android:text="@string/choose_contacts" />
+            android:typeface="sans" />
 
         <CheckBox
             android:id="@+id/checkBox1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/choose_mode" />
-        
+            android:gravity="center_vertical"
+            android:text="@string/choose_mode"
+            android:textSize="14sp"
+            android:typeface="sans" />
+
         <CheckBox
             android:id="@+id/checkBoxNotification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:checked="true"
-            android:text="@string/choose_notification" />
+            android:gravity="center_vertical"
+            android:text="@string/choose_notification"
+            android:textSize="14sp"
+            android:typeface="sans" />
 
     </LinearLayout>

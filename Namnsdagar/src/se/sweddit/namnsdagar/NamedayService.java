@@ -72,8 +72,8 @@ public class NamedayService extends IntentService {
 		calNow.setTimeInMillis(System.currentTimeMillis());
 		
 		Calendar cal = new GregorianCalendar();
-		cal.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
-		cal.roll(Calendar.DAY_OF_YEAR, dayOffset);
+		cal.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR) + dayOffset);
+		cal.roll(Calendar.DAY_OF_YEAR, 1);
 		int month = cal.get(Calendar.MONTH) + 1;
 		int day = cal.get(Calendar.DAY_OF_MONTH);
 				
@@ -93,16 +93,12 @@ public class NamedayService extends IntentService {
 			} while (!cursor.isLast());
 			names += cursor.getString(1);
 			new NamedayNotification((Context)this, names, remind_mode);
-			Log.d("NamedayService", "More than one contacts name day matched selected day ("+names+"). Notification sent.");
 		}
 		else if (cursor.getCount() == 1) {
 			cursor.moveToFirst();
 			names = cursor.getString(1);
 			new NamedayNotification((Context)this, names, remind_mode);
-			Log.d("NamedayService", "One contact's name day matched day ("+names+"). Notification sent.");
 		}
-		else
-			Log.d("NamedayService", "No contacts name day.");
 		db.close();		
 	}
 }

@@ -17,7 +17,7 @@
         android:allowBackup="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.Holo.NoActionBar" >
+        android:theme="@android:style/Theme.Black.NoTitleBar" >
         
         <receiver  android:process=":remote" android:name=".Alarm">
         	<intent-filter >

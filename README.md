@@ -15,5 +15,5 @@ Mer information om projektet och vilka som deltagit finns [här](https://docs.go
 
 Licens
 -------
-Svenska Namnsdagar finns tillgänglig enligt [GPLv3](http://www.gnu.org/licenses/gpl.txt)
+Svenska Namnsdagar är licenserad enligt [GPLv3](http://www.gnu.org/licenses/gpl.txt)
 och använder 'android.jar' och 'android-support-v4.jar' enligt [APACHE License 2](http://www.apache.org/licenses/LICENSE-2.0.txt)

@@ -15,7 +15,7 @@ Mer information om projektet och vilka som deltagit finns [här](https://docs.go
 
 Bygg-instruktioner
 -------
-Se till att ha en ANDROID_HOME variabel som pekar på din android-sdk.
+Se till att ha en ANDROID_HOME-variabel som pekar på din android-sdk.
 
 Instruktionerna nedan antar att du står i samma mapp som build.xml.
 För en release-build:  

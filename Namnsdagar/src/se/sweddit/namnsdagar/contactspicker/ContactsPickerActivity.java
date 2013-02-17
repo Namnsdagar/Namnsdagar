@@ -4,26 +4,22 @@ import java.util.ArrayList;
 
 import se.sweddit.namnsdagar.DBHelper;
 import se.sweddit.namnsdagar.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.ListAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class ContactsPickerActivity extends Activity {
 
@@ -41,8 +37,6 @@ public class ContactsPickerActivity extends Activity {
 		//TODO detta bör givetvis inte göras varje gång 
 		acceptableNames = getAllNames();
 
-
-
 		listView = (ListView) findViewById( R.id.contactsListView);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -50,16 +44,8 @@ public class ContactsPickerActivity extends Activity {
 			public void onItemClick( AdapterView<?> parent, View item, int position, long id) {
 				Contact contact = listAdapter.getItem(position);
 
-
-				if (!acceptableNames.contains(Misc.getFirstName(contact.getName()))) {
-					showSuggestionDialog(contact);
-				} else {
-					contact.toggle();
-
-
-					ContactViewHolder viewHolder = (ContactViewHolder) item.getTag();
-					viewHolder.getCheckBox().setChecked(contact.getChecked());
-				}
+				ContactViewHolder viewHolder = (ContactViewHolder) item.getTag();
+				checkContactName(contact,viewHolder.getCheckBox());
 			}
 		});
 
@@ -69,36 +55,46 @@ public class ContactsPickerActivity extends Activity {
 		listView.setAdapter(listAdapter);      
 	}
 
-	public void showSuggestionDialog(final Contact c) {
-		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	public void checkContactName(Contact contact,CheckBox cb) {
+		if (!contact.getChecked() &&
+				!acceptableNames.contains(Misc.getFirstName(contact.getName()))) {
+			showSuggestionDialog(contact);
+		} else {
+			contact.toggle();
+			cb.setChecked(contact.getChecked());
+		}
+	}
 
+	public void showSuggestionDialog(final Contact c) {
+		AlertDialog alertDialog = null;
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		final AutoCompleteTextView input = new AutoCompleteTextView(this);
 
 		ArrayAdapter<String> suggestionAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,acceptableNames);
 		input.setAdapter(suggestionAdapter);
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		input.setThreshold(1);
+		input.setDropDownHeight(LayoutParams.WRAP_CONTENT);
+		input.setCompletionHint("Välj ett namn ur listan");
 
-		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String value = input.getEditableText().toString();
-
-				//vet inte om detta funkar som det skall
-				//c.setName(value);
-				
-				//gör något med det nya namnet
-				//släng in i DB kanske?
-				
-				c.setChecked(true);
-			}
-		});
-
-
-
-		final AlertDialog alertDialog = builder.create();
+		alertDialog = builder.create();
 		alertDialog.setTitle("Kunde inte hitta " + Misc.getFirstName(c.getName()));
 
 		alertDialog.setIcon(R.drawable.icon);
 		alertDialog.setView(input);
+		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String value = input.getEditableText().toString();
+
+				if (acceptableNames.contains(value)) {
+					c.setName(value);
+					c.setChecked(true);
+				}
+			}
+		});
+		
 		alertDialog.show();
+		alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 	}
 
 	private ArrayList<String> getAllNames() {
@@ -136,7 +132,7 @@ public class ContactsPickerActivity extends Activity {
 			do {
 				contactItem = new Contact();
 				contactItem.setId(cursor.getInt(0));
-				contactItem.setName(cursor.getString(1));
+				contactItem.setName(cursor.getString(3));
 				contactItem.setChecked(true);
 				contactList.add(contactItem);
 			} while (cursor.moveToNext());
@@ -150,6 +146,7 @@ public class ContactsPickerActivity extends Activity {
 	public void onBackPressed() {
 		//selection complete
 		ArrayList<Contact> selectedContacts = listAdapter.getSelectedContacts();
+
 		try {
 			DBHelper dbh = new DBHelper(this);
 			SQLiteDatabase db = dbh.getWritableDatabase();
@@ -158,18 +155,19 @@ public class ContactsPickerActivity extends Activity {
 			for (Contact c : selectedContacts) {
 				int month=1;
 				int day=1;
-	    		try {
-	    			String[] nameArr = c.getName().split(" ");
-	    			String selectQuery = "SELECT month,day FROM days WHERE name = '"+nameArr[0]+"';";
-	    			Cursor cursor = db.rawQuery(selectQuery, null);
-	    			cursor.moveToFirst();
-	    			if (!cursor.isAfterLast()) {
-	    				month = cursor.getInt(0);
-	    				day = cursor.getInt(1);
-	    			}
-	    		} catch (Exception e) {
-	    			Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
-	    		}
+				try {
+					String[] nameArr = c.getName().split(" ");
+					String selectQuery = "SELECT month,day FROM days WHERE name = '"+nameArr[0]+"';";
+					Cursor cursor = db.rawQuery(selectQuery, null);
+					cursor.moveToFirst();
+					if (!cursor.isAfterLast()) {
+						month = cursor.getInt(0);
+						day = cursor.getInt(1);
+					}
+					cursor.close();
+				} catch (Exception e) {
+					Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
+				}
 				db.execSQL("INSERT INTO selectedcontacts (id_contact,name,month,day) VALUES (" + c.getId() + ",'" + c.getName() + "',"+month+","+day+");");
 			}
 			db.execSQL("COMMIT TRANSACTION");
@@ -177,10 +175,6 @@ public class ContactsPickerActivity extends Activity {
 		} catch (Exception e) {
 			Log.e("DB_INSERT","Failed to update selected contacts, "+e.toString());
 		}
-
-		//do something with selected contacts...
-		Toast toast = Toast.makeText(getApplicationContext(), "Selected " + selectedContacts.size() + " contacts!", Toast.LENGTH_SHORT);
-		toast.show();
 
 		listAdapter.deselectAll();
 		super.onBackPressed();

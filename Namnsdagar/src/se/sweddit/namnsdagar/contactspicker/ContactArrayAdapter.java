@@ -3,8 +3,6 @@ package se.sweddit.namnsdagar.contactspicker;
 import java.util.ArrayList;
 
 import se.sweddit.namnsdagar.R;
-
-import android.app.Activity;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
@@ -17,19 +15,19 @@ import android.widget.TextView;
 
 class ContactArrayAdapter extends ArrayAdapter<Contact> {
 	private LayoutInflater layoutInflater;
-	private Activity parentActivity;
+	private ContactsPickerActivity parentActivity;
 	private ArrayList<Contact> contactsInDB;
 
-	public ContactArrayAdapter(Activity context, ArrayList<Contact> contactsInDB) {
+	public ContactArrayAdapter(ContactsPickerActivity context, ArrayList<Contact> contactsInDB) {
 		super(context, R.layout.contactslistrow, R.id.rowTextView);
 		this.parentActivity = context;
-		
+
 		this.deselectAll();
 
 		this.contactsInDB = contactsInDB;
 		this.addAll(getContacts());
-		
-		
+
+
 		layoutInflater = LayoutInflater.from(context) ;
 	}
 
@@ -46,9 +44,9 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 				RawContacts.DISPLAY_NAME_SOURCE
 		};
 
-		
+
 		String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
-		
+
 		final Cursor rawContacts = parentActivity.managedQuery(
 				RawContacts.CONTENT_URI,
 				projection,null,null,sortOrder);
@@ -62,7 +60,7 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 		if(rawContacts.moveToFirst()) {
 			while(!rawContacts.isAfterLast()) {
 				final int contactId = rawContacts.getInt(contactIdColumnIndex);
-				final String contactName = rawContacts.getString(nameColumnIndex);
+				String contactName = rawContacts.getString(nameColumnIndex);
 				final int contactNameSrc = rawContacts.getInt(nameSrcColumnIndex);
 				final boolean deleted = (rawContacts.getInt(deletedColumnIndex) == 1);
 
@@ -71,10 +69,20 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 						!containsName(contactName,list) &&
 						!containsID(contactId, list) &&
 						Misc.isValidName(contactName)) {
-					
+
+					//renames contact if contactName and DBname are different
+					if (containsID(contactId,contactsInDB) ){
+						Contact dbContact = contactsInDB.get(indexOfID(contactId, contactsInDB));
+	
+						String dbName = dbContact.getName();
+						if (!dbName.equals(contactName)) {
+							contactName = dbName;
+						}
+					}
+
 					list.add(new Contact(contactId,contactName, containsID(contactId, contactsInDB)));
 				}
-				
+
 				rawContacts.moveToNext();
 			}
 		}
@@ -82,7 +90,7 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 		rawContacts.close();
 		return list;
 	}
-	
+
 	public void deselectAll() {
 		for (int i = 0; i < getCount(); i++) {
 			getItem(i).setChecked(false);
@@ -97,7 +105,7 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 
 		return false;
 	}
-	
+
 	public boolean containsID(int id, ArrayList<Contact> list) {
 		for (Contact contact : list) {
 			if (contact.getId() == id)
@@ -105,6 +113,18 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 		}
 
 		return false;
+	}
+
+	public int indexOfID(int id, ArrayList<Contact> list) {
+		int i = 0;
+
+		for (Contact contact : list) {
+			if (contact.getId() == id)
+				return i;
+			i++;
+		}
+
+		return -1;
 	}
 
 	public ArrayList<Contact> getSelectedContacts() {
@@ -132,17 +152,12 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 			checkBox = (CheckBox) convertView.findViewById(R.id.rowCheckBox);
 
 			convertView.setTag( new ContactViewHolder(textView,checkBox));
-			checkBox.setOnClickListener( new View.OnClickListener() {
-				public void onClick(View v) {
-					CheckBox cb = (CheckBox) v;
-
-					Contact c = (Contact) cb.getTag();
-					c.setChecked(cb.isChecked());
-				}
-			});        
+			checkBox.setClickable(false);      
 		} else {
 			ContactViewHolder viewHolder = (ContactViewHolder) convertView.getTag();
 			checkBox = viewHolder.getCheckBox() ;
+			checkBox.setClickable(false);   
+
 			textView = viewHolder.getTextView() ;
 		}
 

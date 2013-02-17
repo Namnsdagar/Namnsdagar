@@ -60,10 +60,10 @@ public class Settings extends Activity {
 			public void onCheckedChanged(CompoundButton button, boolean isChecked) {
 				// TODO Auto-generated method stub
 	        	SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, 0);
+	        	Log.i("SET_MODE","Previous mode: "+settings.getBoolean("remind_mode", false)+", New mode: "+isChecked);
 	        	SharedPreferences.Editor editor = settings.edit();
 	        	editor.putBoolean("remind_mode", isChecked);
 	        	editor.commit();
-	        	Log.i("SET_MODE","Mode: "+isChecked);
 			}
         });
 
@@ -122,6 +122,9 @@ public class Settings extends Activity {
         	String displayMinute = minute+"";
         	if (minute<10) displayMinute = "0"+minute;
         	timeText.setText(getResources().getString(R.string.set_time)+" ("+hourOfDay+":"+displayMinute+")");
+            // Start Alarm for nameday checks
+            Alarm alarm = new Alarm();
+            alarm.SetAlarm(Settings.this);
             tDialog.hide();
             Log.i("SET_TIME","Hour: "+hourOfDay+", Minute: "+minute);
             

@@ -70,8 +70,7 @@ public class MainActivity extends Activity {
     	
         if (isFirstLaunch()) {
         	dialog.show();
-        	
-        	// Start Alarm for name day checks
+
             Alarm alarm = new Alarm();
             alarm.SetAlarm(this);
         } else {
@@ -112,7 +111,7 @@ public class MainActivity extends Activity {
     }
  
     private void loadData(boolean unofficial) {
-    	progress = ProgressDialog.show(MainActivity.this,"","Förbereder...");
+    	progress = ProgressDialog.show(MainActivity.this,"","F�rbereder...");
     	Runnable r = new dataThread(unofficial,MainActivity.this);
     	new Thread(r).start();
     }

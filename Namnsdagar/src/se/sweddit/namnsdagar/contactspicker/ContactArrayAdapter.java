@@ -17,10 +17,10 @@ import android.widget.TextView;
 
 class ContactArrayAdapter extends ArrayAdapter<Contact> {
 	private LayoutInflater layoutInflater;
-	private Activity parentActivity;
+	private ContactsPickerActivity parentActivity;
 	private ArrayList<Contact> contactsInDB;
 
-	public ContactArrayAdapter(Activity context, ArrayList<Contact> contactsInDB) {
+	public ContactArrayAdapter(ContactsPickerActivity context, ArrayList<Contact> contactsInDB) {
 		super(context, R.layout.contactslistrow, R.id.rowTextView);
 		this.parentActivity = context;
 		
@@ -132,17 +132,12 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 			checkBox = (CheckBox) convertView.findViewById(R.id.rowCheckBox);
 
 			convertView.setTag( new ContactViewHolder(textView,checkBox));
-			checkBox.setOnClickListener( new View.OnClickListener() {
-				public void onClick(View v) {
-					CheckBox cb = (CheckBox) v;
-
-					Contact c = (Contact) cb.getTag();
-					c.setChecked(cb.isChecked());
-				}
-			});        
+			checkBox.setClickable(false);      
 		} else {
 			ContactViewHolder viewHolder = (ContactViewHolder) convertView.getTag();
 			checkBox = viewHolder.getCheckBox() ;
+			checkBox.setClickable(false);   
+			
 			textView = viewHolder.getTextView() ;
 		}
 

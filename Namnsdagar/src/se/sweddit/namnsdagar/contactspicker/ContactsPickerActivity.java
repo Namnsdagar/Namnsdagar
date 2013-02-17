@@ -4,24 +4,18 @@ import java.util.ArrayList;
 
 import se.sweddit.namnsdagar.DBHelper;
 import se.sweddit.namnsdagar.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.ListAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -50,16 +44,8 @@ public class ContactsPickerActivity extends Activity {
 			public void onItemClick( AdapterView<?> parent, View item, int position, long id) {
 				Contact contact = listAdapter.getItem(position);
 
-
-				if (!acceptableNames.contains(Misc.getFirstName(contact.getName()))) {
-					showSuggestionDialog(contact);
-				} else {
-					contact.toggle();
-
-
-					ContactViewHolder viewHolder = (ContactViewHolder) item.getTag();
-					viewHolder.getCheckBox().setChecked(contact.getChecked());
-				}
+				ContactViewHolder viewHolder = (ContactViewHolder) item.getTag();
+				checkContactName(contact,viewHolder.getCheckBox());
 			}
 		});
 
@@ -68,29 +54,23 @@ public class ContactsPickerActivity extends Activity {
 
 		listView.setAdapter(listAdapter);      
 	}
+	
+	public void checkContactName(Contact contact,CheckBox cb) {
+		if (!contact.getChecked() &&
+				!acceptableNames.contains(Misc.getFirstName(contact.getName()))) {
+			showSuggestionDialog(contact);
+		} else {
+			contact.toggle();
+			cb.setChecked(contact.getChecked());
+		}
+	}
 
 	public void showSuggestionDialog(final Contact c) {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
 		final AutoCompleteTextView input = new AutoCompleteTextView(this);
 
 		ArrayAdapter<String> suggestionAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,acceptableNames);
 		input.setAdapter(suggestionAdapter);
-
-		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String value = input.getEditableText().toString();
-
-				//vet inte om detta funkar som det skall
-				//c.setName(value);
-				
-				//gör något med det nya namnet
-				//släng in i DB kanske?
-				
-				c.setChecked(true);
-			}
-		});
-
 
 
 		final AlertDialog alertDialog = builder.create();
@@ -98,6 +78,16 @@ public class ContactsPickerActivity extends Activity {
 
 		alertDialog.setIcon(R.drawable.icon);
 		alertDialog.setView(input);
+		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String value = input.getEditableText().toString();
+				
+				if (acceptableNames.contains(value)) {
+					c.setName(value);
+					c.setChecked(true);
+				}
+			}
+		});
 		alertDialog.show();
 	}
 

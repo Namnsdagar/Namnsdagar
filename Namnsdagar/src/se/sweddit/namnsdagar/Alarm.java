@@ -62,8 +62,9 @@ public class Alarm extends BroadcastReceiver {
 	
 	public void RemoveAlarm(Context context) {
 		Intent i = new Intent(context, Alarm.class);
-		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+		PendingIntent pi = PendingIntent.getBroadcast(context, 101, i, 0);
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmManager.cancel(pi);
+		Log.d("ALARM_SET", "Alarm stopped!");
 	}
 }

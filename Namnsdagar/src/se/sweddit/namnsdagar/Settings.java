@@ -66,15 +66,36 @@ public class Settings extends Activity {
 	        	editor.commit();
 			}
         });
+        
+        CheckBox notificationSelect = (CheckBox) findViewById(R.id.checkBoxNotification);
+        notificationSelect.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        	
+			@Override
+			public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+	        	SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, 0);
+	        	Log.i("SET_NOTIFICATION","Previous notify mode: "+settings.getBoolean("notification_mode", true)+", New notify mode: "+isChecked);
+	        	SharedPreferences.Editor editor = settings.edit();
+	        	editor.putBoolean("notification_mode", isChecked);
+	        	editor.commit();
+	        	
+	        	Alarm alarm = new Alarm();
+	        	if (isChecked)
+	        		alarm.SetAlarm(getApplicationContext());
+	        	else
+	        		alarm.RemoveAlarm(getApplicationContext());
+			}
+        });
 
     	SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, 0);
     	int hourOfDay = settings.getInt("remind_hour", 8);
     	int minute = settings.getInt("remind_minute", 0);
     	boolean mode = settings.getBoolean("remind_mode", false);
+    	boolean notification_mode = settings.getBoolean("notification_mode", true);
     	String displayMinute = minute+"";
     	if (minute<10) displayMinute = "0"+minute;
     	timeLink.setText(getResources().getString(R.string.set_time)+" ("+hourOfDay+":"+displayMinute+")");
     	modeSelect.setChecked(mode);
+    	notificationSelect.setChecked(notification_mode);
 
     	int selCount = getSelectedCount(this);
     	contactText.setText(getResources().getString(R.string.choose_contacts)+" ("+selCount+")");

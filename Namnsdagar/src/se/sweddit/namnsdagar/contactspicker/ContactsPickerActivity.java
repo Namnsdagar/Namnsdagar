@@ -167,6 +167,7 @@ public class ContactsPickerActivity extends Activity {
 	    				month = cursor.getInt(0);
 	    				day = cursor.getInt(1);
 	    			}
+	    			cursor.close();
 	    		} catch (Exception e) {
 	    			Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
 	    		}

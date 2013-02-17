@@ -122,6 +122,9 @@ public class Settings extends Activity {
         	String displayMinute = minute+"";
         	if (minute<10) displayMinute = "0"+minute;
         	timeText.setText(getResources().getString(R.string.set_time)+" ("+hourOfDay+":"+displayMinute+")");
+            // Start Alarm for nameday checks
+            Alarm alarm = new Alarm();
+            alarm.SetAlarm(Settings.this);
             tDialog.hide();
             Log.i("SET_TIME","Hour: "+hourOfDay+", Minute: "+minute);
         }

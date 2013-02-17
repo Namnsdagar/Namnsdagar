@@ -12,3 +12,8 @@ Om
 -------
 Den här appen är ett resultat av [Sweddits hackaton](http://www.reddit.com/r/sweden/comments/18muv2/nu_k%C3%B6r_vi_ig%C3%A5ng_med_androidhackaton/) som skapades efter initiativ av [SwedishDude](http://www.reddit.com/user/SwedishDude).
 Mer information om projektet och vilka som deltagit finns [här](https://docs.google.com/document/d/1zNbrrferMtFvOqqw06S5g2zd5wIOL2j_vvvEyAUZheo/edit#).
+
+Licens
+-------
+Svenska Namnsdagar finns tillgänglig enligt [GPLv3](http://www.gnu.org/licenses/gpl.txt)
+och använder 'android.jar' och 'android-support-v4.jar' enligt [APACHE License 2](http://www.apache.org/licenses/LICENSE-2.0.txt)

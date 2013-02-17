@@ -10,14 +10,16 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class ContactsPickerActivity extends Activity {
 
@@ -52,7 +54,7 @@ public class ContactsPickerActivity extends Activity {
 
 		listView.setAdapter(listAdapter);      
 	}
-	
+
 	public void checkContactName(Contact contact,CheckBox cb) {
 		if (!contact.getChecked() &&
 				!acceptableNames.contains(Misc.getFirstName(contact.getName()))) {
@@ -64,14 +66,18 @@ public class ContactsPickerActivity extends Activity {
 	}
 
 	public void showSuggestionDialog(final Contact c) {
+		AlertDialog alertDialog = null;
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		final AutoCompleteTextView input = new AutoCompleteTextView(this);
 
 		ArrayAdapter<String> suggestionAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,acceptableNames);
 		input.setAdapter(suggestionAdapter);
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		input.setThreshold(1);
+		input.setDropDownHeight(LayoutParams.WRAP_CONTENT);
+		input.setCompletionHint("Välj ett namn ur listan");
 
-
-		final AlertDialog alertDialog = builder.create();
+		alertDialog = builder.create();
 		alertDialog.setTitle("Kunde inte hitta " + Misc.getFirstName(c.getName()));
 
 		alertDialog.setIcon(R.drawable.icon);
@@ -79,14 +85,16 @@ public class ContactsPickerActivity extends Activity {
 		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String value = input.getEditableText().toString();
-				
+
 				if (acceptableNames.contains(value)) {
 					c.setName(value);
 					c.setChecked(true);
 				}
 			}
 		});
+		
 		alertDialog.show();
+		alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 	}
 
 	private ArrayList<String> getAllNames() {
@@ -138,6 +146,7 @@ public class ContactsPickerActivity extends Activity {
 	public void onBackPressed() {
 		//selection complete
 		ArrayList<Contact> selectedContacts = listAdapter.getSelectedContacts();
+
 		try {
 			DBHelper dbh = new DBHelper(this);
 			SQLiteDatabase db = dbh.getWritableDatabase();
@@ -146,19 +155,19 @@ public class ContactsPickerActivity extends Activity {
 			for (Contact c : selectedContacts) {
 				int month=1;
 				int day=1;
-	    		try {
-	    			String[] nameArr = c.getName().split(" ");
-	    			String selectQuery = "SELECT month,day FROM days WHERE name = '"+nameArr[0]+"';";
-	    			Cursor cursor = db.rawQuery(selectQuery, null);
-	    			cursor.moveToFirst();
-	    			if (!cursor.isAfterLast()) {
-	    				month = cursor.getInt(0);
-	    				day = cursor.getInt(1);
-	    			}
-	    			cursor.close();
-	    		} catch (Exception e) {
-	    			Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
-	    		}
+				try {
+					String[] nameArr = c.getName().split(" ");
+					String selectQuery = "SELECT month,day FROM days WHERE name = '"+nameArr[0]+"';";
+					Cursor cursor = db.rawQuery(selectQuery, null);
+					cursor.moveToFirst();
+					if (!cursor.isAfterLast()) {
+						month = cursor.getInt(0);
+						day = cursor.getInt(1);
+					}
+					cursor.close();
+				} catch (Exception e) {
+					Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
+				}
 				db.execSQL("INSERT INTO selectedcontacts (id_contact,name,month,day) VALUES (" + c.getId() + ",'" + c.getName() + "',"+month+","+day+");");
 			}
 			db.execSQL("COMMIT TRANSACTION");

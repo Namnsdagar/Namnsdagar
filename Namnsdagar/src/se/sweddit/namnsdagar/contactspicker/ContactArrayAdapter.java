@@ -26,7 +26,10 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 		this.deselectAll();
 
 		this.contactsInDB = contactsInDB;
-		this.addAll(getContacts());
+		ArrayList<Contact> cList = getContacts();
+		for (Contact contact:cList) {
+			this.add(contact);
+		}
 
 
 		layoutInflater = LayoutInflater.from(context) ;

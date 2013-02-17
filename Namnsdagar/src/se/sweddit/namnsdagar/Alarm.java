@@ -42,14 +42,16 @@ public class Alarm extends BroadcastReceiver {
 
 		// We want the event 08:00 every day
 		Calendar cal = new GregorianCalendar();
-		cal.add(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
+		cal.set(Calendar.DAY_OF_YEAR, calNow.get(Calendar.DAY_OF_YEAR));
 		cal.set(Calendar.HOUR_OF_DAY, hour);
 		cal.set(Calendar.MINUTE, minute);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 		// Set the alarm to next day if desired time have passed
-		if (calNow.getTime().after(cal.getTime()))
+		if (calNow.getTime().after(cal.getTime())) {
+			Log.d("ALARM_SET", "Setting alarm to fire tomorrow...");
 			cal.roll(Calendar.DAY_OF_YEAR, 1);
+		}
 
 		AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 		Intent i = new Intent("se.sweddit.namnsdagar.ALARM");

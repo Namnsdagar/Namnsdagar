@@ -127,9 +127,6 @@ public class Settings extends Activity {
             alarm.SetAlarm(Settings.this);
             tDialog.hide();
             Log.i("SET_TIME","Hour: "+hourOfDay+", Minute: "+minute);
-            
-            Alarm alarm = new Alarm();
-            alarm.SetAlarm(view.getContext());
         }
     }
 

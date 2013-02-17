@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
@@ -26,6 +27,9 @@ public class ContactsPickerActivity extends Activity {
 	private ListView listView;
 	private ContactArrayAdapter listAdapter ;
 	private ArrayList<String> acceptableNames;
+	
+	private Cursor cursor;
+	private SQLiteDatabase db;
 
 	AlertDialog suggestionDialog;
 
@@ -33,7 +37,8 @@ public class ContactsPickerActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contactslist);
-
+	
+		
 		//TODO detta bör givetvis inte göras varje gång 
 		acceptableNames = getAllNames();
 
@@ -101,10 +106,10 @@ public class ContactsPickerActivity extends Activity {
 		ArrayList<String> namelist = new ArrayList<String>();
 
 		DBHelper dbh = new DBHelper(this);
-		SQLiteDatabase db = dbh.getReadableDatabase();
+		db = dbh.getReadableDatabase();
 
 		String selectQuery = "SELECT * FROM days;";
-		Cursor cursor = db.rawQuery(selectQuery, null);
+		cursor = db.rawQuery(selectQuery, null);
 		cursor.moveToFirst();
 
 		if (!cursor.isAfterLast()) {
@@ -113,6 +118,9 @@ public class ContactsPickerActivity extends Activity {
 				namelist.add(s);
 			} while (cursor.moveToNext());
 		}
+		
+
+	//	cursor.close();
 		db.close();
 
 		return namelist;
@@ -123,33 +131,33 @@ public class ContactsPickerActivity extends Activity {
 
 		Contact contactItem;
 		DBHelper dbh = new DBHelper(this);
-		SQLiteDatabase db = dbh.getReadableDatabase();
+		db = dbh.getReadableDatabase();
 
 		String selectQuery = "SELECT * FROM selectedcontacts;";
-		Cursor cursor = db.rawQuery(selectQuery, null);
+		cursor = db.rawQuery(selectQuery, null);
 		cursor.moveToFirst();
 		if (!cursor.isAfterLast()) {
 			do {
 				contactItem = new Contact();
 				contactItem.setId(cursor.getInt(0));
-				contactItem.setName(cursor.getString(3));
+				contactItem.setName(cursor.getString(1));
 				contactItem.setChecked(true);
 				contactList.add(contactItem);
 			} while (cursor.moveToNext());
 		}
-		db.close();
 
+	//	cursor.close();
+		db.close();
+		
 		return contactList;
 	}
-
-	@Override
-	public void onBackPressed() {
-		//selection complete
+	
+	public void saveContactsToDB() {
 		ArrayList<Contact> selectedContacts = listAdapter.getSelectedContacts();
 
 		try {
 			DBHelper dbh = new DBHelper(this);
-			SQLiteDatabase db = dbh.getWritableDatabase();
+			db = dbh.getWritableDatabase();
 			db.execSQL("DELETE FROM selectedcontacts;");
 			db.execSQL("BEGIN IMMEDIATE TRANSACTION");
 			for (Contact c : selectedContacts) {
@@ -158,13 +166,14 @@ public class ContactsPickerActivity extends Activity {
 				try {
 					String[] nameArr = c.getName().split(" ");
 					String selectQuery = "SELECT month,day FROM days WHERE name = '"+nameArr[0]+"';";
-					Cursor cursor = db.rawQuery(selectQuery, null);
+					cursor = db.rawQuery(selectQuery, null);
+					
 					cursor.moveToFirst();
 					if (!cursor.isAfterLast()) {
 						month = cursor.getInt(0);
 						day = cursor.getInt(1);
 					}
-					cursor.close();
+				//	cursor.close();
 				} catch (Exception e) {
 					Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
 				}
@@ -175,7 +184,50 @@ public class ContactsPickerActivity extends Activity {
 		} catch (Exception e) {
 			Log.e("DB_INSERT","Failed to update selected contacts, "+e.toString());
 		}
+	}
+	
+	
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_HOME) {
+	    	Log.i("DEBUG", "Pressed HOME");
 
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	protected void onResume() {
+		if (cursor.isClosed()) {
+			Log.i("DEBUG", "Cursor is closed!");
+			
+			//cursor = new CursorLoader(this).loadInBackground();
+		}
+		
+		
+		Log.i("DEBUG", "Resume");
+		super.onResume();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		Log.i("DEBUG", "Destroy");
+		super.onDestroy();
+	}
+	
+	@Override
+	protected void onStop() {
+		Log.i("DEBUG", "Stop");
+		
+		cursor.close();				
+		super.onStop();
+	}
+
+	@Override
+	public void onBackPressed() {
+		saveContactsToDB();
 		listAdapter.deselectAll();
 		super.onBackPressed();
 	}

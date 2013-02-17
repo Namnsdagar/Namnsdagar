@@ -28,7 +28,7 @@ public class NamedayService extends IntentService {
 	protected void worker(Intent intent) {
 		// Check namedays here...
 		Log.d("NamedayService", "NamedayService worker method running...");
-		checkContactsNameday(); // TODO: Dayoffset for notifications earlier. 
+		checkContactsNameday();
 	}
 	
 	synchronized static PowerManager.WakeLock getWakeLock(Context context) {
@@ -84,21 +84,21 @@ public class NamedayService extends IntentService {
 		String query = "SELECT * FROM selectedcontacts WHERE month='" + month + "' AND day='" + day + "'";
 		Cursor cursor = db.rawQuery(query, null);
 		cursor = db.rawQuery(query, null);
-		List<String> names = new ArrayList<String>();
-		if (cursor.getCount() > 0) {
-			// Get first name
+		String names = "";
+		if (cursor.getCount() > 1) {
 			cursor.moveToFirst();
 			do {
-				names.add(cursor.getString(1));
-			} while (cursor.moveToNext());
-			
-			for (String s : names) {
-				Log.d("NAMEDAY_FOUND", s);
-				
-				// TODO: Send notification
-			}
-		}				
-		
-		db.close();
+				names += cursor.getString(1) + " & ";
+				cursor.moveToNext();
+			} while (!cursor.isLast());
+			names += cursor.getString(1);
+			new NamedayNotification((Context)this, names, remind_mode);
+		}
+		else if (cursor.getCount() == 1) {
+			cursor.moveToFirst();
+			names = cursor.getString(1);
+			new NamedayNotification((Context)this, names, remind_mode);
+		}
+		db.close();		
 	}
 }

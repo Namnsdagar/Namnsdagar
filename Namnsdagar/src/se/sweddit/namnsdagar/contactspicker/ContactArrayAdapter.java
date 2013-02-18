@@ -16,9 +16,10 @@ You should have received a copy of the GNU General Public License
 along with Svenska Namnsdagar.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 
 import se.sweddit.namnsdagar.R;
+import se.sweddit.namnsdagar.contact.Contact;
+import se.sweddit.namnsdagar.contact.ContactList;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
@@ -32,16 +33,16 @@ import android.widget.TextView;
 class ContactArrayAdapter extends ArrayAdapter<Contact> {
 	private LayoutInflater layoutInflater;
 	private ContactsPickerActivity parentActivity;
-	private ArrayList<Contact> contactsInDB;
+	private ContactList contactsInDB;
 
-	public ContactArrayAdapter(ContactsPickerActivity context, ArrayList<Contact> contactsInDB) {
+	public ContactArrayAdapter(ContactsPickerActivity context, ContactList contactsInDB) {
 		super(context, R.layout.contactslistrow, R.id.rowTextView);
 		this.parentActivity = context;
 
 		this.deselectAll();
 
 		this.contactsInDB = contactsInDB;
-		ArrayList<Contact> cList = getContacts();
+		ContactList cList = getContacts();
 		for (Contact contact:cList) {
 			this.add(contact);
 		}
@@ -50,13 +51,10 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 		layoutInflater = LayoutInflater.from(context) ;
 	}
 
-	public ArrayList<Contact> getContacts() {
-		// http://www.higherpass.com/Android/Tutorials/Working-With-Android-Contacts/
-
-		ArrayList<Contact> list = new ArrayList<Contact>();
+	public ContactList getContacts() {
+		ContactList list = new ContactList();
 		
 		String sortOrder = ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
-
 		ContentResolver cr = parentActivity.getContentResolver();
 		Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,null, null, null, sortOrder);
 
@@ -66,22 +64,26 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 				String contactName = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
 
-				if (contactName != null && !containsName(contactName,list) &&
-						!containsID(contactId, list) &&
+				if (contactName != null && 
+						!list.containsName(contactName) &&
+						!list.containsID(contactId) &&
 						Misc.isValidName(contactName)) {
 
 					//renames contact if contactName and DBname are different
-					if (containsID(contactId,contactsInDB) ){
-						Contact dbContact = contactsInDB.get(indexOfID(contactId, contactsInDB));
-
-						String dbName = dbContact.getName();
-						if (!dbName.equals(contactName)) {
-							contactName = dbName;
+					boolean isIdInDB = contactsInDB.containsID(contactId);
+					if (isIdInDB){
+						
+						if (contactsInDB.indexOfID(contactId) != -1) {
+							Contact dbContact = contactsInDB.get(contactsInDB.indexOfID(contactId));
+	
+							String dbName = dbContact.getName();
+							if (!dbName.equals(contactName)) {
+								contactName = dbName;
+							}
 						}
 					}
 
-					list.add(new Contact(contactId,contactName, containsID(contactId, contactsInDB)));
-
+					list.add(new Contact(contactId,contactName,isIdInDB));
 				}
 			}
 		}
@@ -95,38 +97,8 @@ class ContactArrayAdapter extends ArrayAdapter<Contact> {
 		}
 	}
 
-	public boolean containsName(String name, ArrayList<Contact> list) {
-		for (Contact contact : list) {
-			if (contact.getName().equalsIgnoreCase(name))
-				return true;
-		}
-
-		return false;
-	}
-
-	public boolean containsID(int id, ArrayList<Contact> list) {
-		for (Contact contact : list) {
-			if (contact.getId() == id)
-				return true;
-		}
-
-		return false;
-	}
-
-	public int indexOfID(int id, ArrayList<Contact> list) {
-		int i = 0;
-
-		for (Contact contact : list) {
-			if (contact.getId() == id)
-				return i;
-			i++;
-		}
-
-		return -1;
-	}
-
-	public ArrayList<Contact> getSelectedContacts() {
-		ArrayList<Contact> selected = new ArrayList<Contact>();
+	public ContactList getSelectedContacts() {
+		ContactList selected = new ContactList();
 
 		for (int i = 0; i < getCount(); i++) {
 			if (getItem(i).getChecked())

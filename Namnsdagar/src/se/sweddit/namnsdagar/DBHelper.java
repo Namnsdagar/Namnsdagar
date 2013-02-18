@@ -20,13 +20,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
+import se.sweddit.namnsdagar.contact.Contact;
+import se.sweddit.namnsdagar.contact.ContactList;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-
 
 public class DBHelper extends SQLiteOpenHelper {
 	
@@ -44,6 +47,8 @@ public class DBHelper extends SQLiteOpenHelper {
 			" month INT," +
 			" day TEXT);";
 	//private static final String CLEAR_TABLE = "DELETE FROM days;";
+	
+	private Cursor cursor;
 
 	public DBHelper (Context context) {
 		super(context,DB_NAME,null,DB_VERSION);
@@ -75,6 +80,80 @@ public class DBHelper extends SQLiteOpenHelper {
 			Log.e("DB_INSERT","Insert failed: "+e.toString());
 		}
 		db.close();
+	}
+	
+	public void insertContacts(ContactList selectedContacts) {
+		try {
+			SQLiteDatabase db = this.getWritableDatabase();
+			db.execSQL("DELETE FROM selectedcontacts;");
+			db.execSQL("BEGIN IMMEDIATE TRANSACTION");
+			for (Contact c : selectedContacts) {
+				int month=1;
+				int day=1;
+				try {
+					String[] nameArr = c.getName().split(" ");
+					String selectQuery = "SELECT month,day FROM days WHERE name = '"+nameArr[0]+"';";
+					cursor = db.rawQuery(selectQuery, null);
+					
+					cursor.moveToFirst();
+					if (!cursor.isAfterLast()) {
+						month = cursor.getInt(0);
+						day = cursor.getInt(1);
+					}
+				} catch (Exception e) {
+					Log.e("DB_GET","Unable to get selected contacts, "+e.toString());
+				}
+				db.execSQL("INSERT INTO selectedcontacts (id_contact,name,month,day) VALUES (" + c.getId() + ",'" + c.getName() + "',"+month+","+day+");");
+			}
+			db.execSQL("COMMIT TRANSACTION");
+			db.close();
+		} catch (Exception e) {
+			Log.e("DB_INSERT","Failed to update selected contacts, "+e.toString());
+		}
+	}
+	
+
+	public ContactList getContactsInDatabase() {
+		ContactList contactList = new ContactList();
+		Contact contactItem;
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+
+		String selectQuery = "SELECT * FROM selectedcontacts;";
+		cursor = db.rawQuery(selectQuery, null);
+		cursor.moveToFirst();
+		if (!cursor.isAfterLast()) {
+			do {
+				contactItem = new Contact();
+				contactItem.setId(cursor.getInt(0));
+				contactItem.setName(cursor.getString(1));
+				contactItem.setChecked(true);
+				contactList.add(contactItem);
+			} while (cursor.moveToNext());
+		}
+
+		db.close();
+		return contactList;
+	}
+	
+	public ArrayList<String> getAllNames() {
+		ArrayList<String> namelist = new ArrayList<String>();
+
+		SQLiteDatabase db = this.getReadableDatabase();
+
+		String selectQuery = "SELECT * FROM days;";
+		cursor = db.rawQuery(selectQuery, null);
+		cursor.moveToFirst();
+
+		if (!cursor.isAfterLast()) {
+			do {
+				String s = cursor.getString(2);
+				namelist.add(s);
+			} while (cursor.moveToNext());
+		}
+		
+		db.close();
+		return namelist;
 	}
 	
 	@Override

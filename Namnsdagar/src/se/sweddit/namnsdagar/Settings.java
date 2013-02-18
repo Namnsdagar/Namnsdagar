@@ -17,7 +17,6 @@ along with Svenska Namnsdagar.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 import se.sweddit.namnsdagar.contactspicker.ContactsPickerActivity;
-import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -28,13 +27,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class Settings extends Activity {
 	private static final String SETTINGS_NAME = "appSettings";

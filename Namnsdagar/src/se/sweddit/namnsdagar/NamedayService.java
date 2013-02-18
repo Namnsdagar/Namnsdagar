@@ -18,6 +18,7 @@ along with Svenska Namnsdagar.  If not, see <http://www.gnu.org/licenses/>.
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;

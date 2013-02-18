@@ -1,4 +1,4 @@
-package se.sweddit.namnsdagar.contactspicker;
+package se.sweddit.namnsdagar.contact;
 /*
 This file is part of Svenska Namnsdagar
 
@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with Svenska Namnsdagar.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Contact {
+public class Contact {
 	private String name = "";
 	private int id;
 	private boolean checked = false;
